@@ -1,0 +1,7 @@
+[submodule "external/cmaker"]
+	path = external/cmaker
+	url = https://github.com/williammc/cmaker.git
+[submodule "external/slick-1.1"]
+	path = external/slick-1.1
+	url = https://github.com/williammc/Slick.git
+	branch = 1.1
