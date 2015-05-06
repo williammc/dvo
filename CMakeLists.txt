@@ -35,6 +35,13 @@ cmaker_print_status("DVO_CXX_FLAGS:${DVO_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS ${DVO_CXX_FLAGS})
 cmaker_common_build_setting()
 ## Dependencies ================================================================
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/DVODependencies_Config.cmake")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DVODependencies_Config.cmake.in"
+       DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  file(RENAME "${CMAKE_CURRENT_BINARY_DIR}/DVODependencies_Config.cmake.in"
+              "${CMAKE_CURRENT_BINARY_DIR}/DVODependencies_Config.cmake")
+endif()
+include(DVODependencies_Config)
 
 # Slick
 set(Slick_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/slick-1.1)
@@ -46,16 +53,35 @@ find_path(Sophus_INCLUDE_DIR NAMES sophus/sophus.hpp
             PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../sophus)
 include_directories(${Sophus_INCLUDE_DIR})
 
+## Boost
+if(WIN32)
+  set(Boost_USE_STATIC_LIBS  ON)
+endif(WIN32)
+
+find_package(Boost)
+
+if(NOT Boost_FOUND)
+  cmaker_print_error("Cannot find boost")
+endif()
+
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIR})
+cmaker_print_status("Boost libs: ${Boost_LIBRARIES}")
+
 # OpenCV
+##  OpenCV
 find_package(OpenCV REQUIRED)
-get_filename_component(OpenCV_BINARY_DIR "${OpenCV_LIB_DIR}/../bin" ABSOLUTE)
 include_directories(${OpenCV_INCLUDE_DIRS})
 list(APPEND DVO_EXTERNAL_LIBS ${OpenCV_LIBRARIES})
+cmaker_print_status("OpenCV include dirs:${OpenCV_INCLUDE_DIRS}")
+cmaker_print_status("OpenCV libs:${OpenCV_LIBRARIES}")
+get_filename_component(OpenCV_BINARY_DIR "${OpenCV_LIB_DIR}/../bin" ABSOLUTE)
+list(APPEND THE_DEPEDENCIES_BINARY_PATHS ${OpenCV_BINARY_DIR})
 
 # TBB
-set(TBB_INSTALL_DIR "D:/deps_msvc_common/tbb42_20140601oss")
-set(TBB_ARCH_PLATFORM "intel64")
-set(TBB_COMPILER "vc12")
+# set(TBB_INSTALL_DIR "D:/deps_msvc_common/tbb42_20140601oss")
+# set(TBB_ARCH_PLATFORM "ia32")
+# set(TBB_COMPILER "vc12")
 find_package(TBB REQUIRED)
 include_directories(${TBB_INCLUDE_DIR})
 cmaker_cull_library_paths(TBB_LIBRARIES)
@@ -91,8 +117,10 @@ set_property(TARGET dvo PROPERTY FOLDER "external/dvo")
 
 set(ALL_LIBRARIES dvo ${DVO_EXTERNAL_LIBS} )
 ## Tests
-set(tests test_tracking_dense_matcher test_tracking_dense_matcher_stream
-          test_tracking_dense_matcher_live)
+set(tests test_tracking_dense_matcher
+          test_tracking_dense_matcher_stream
+          #test_tracking_dense_matcher_live
+          )
 foreach(test ${tests})
   add_executable(${test} test/${test}.cc)
   target_link_libraries(${test} dvo  ${DVO_EXTERNAL_LIBS})
@@ -102,6 +130,43 @@ foreach(test ${tests})
     cotire(${test})
   endif()
 endforeach()
+
+# Useful Windows paths settings ================================================
+# Useful paths configuration for windows 
+if(WIN32)
+  if(MSVC)
+    if(CMAKE_CL_64)
+      set(WIN32_ARCH x64)
+    else()
+      set(WIN32_ARCH x86)
+    endif()
+    if(MSVC_VERSION EQUAL 1400)
+      set(StructuralModeling_RUNTIME vc8)
+    elseif(MSVC_VERSION EQUAL 1500)
+      set(StructuralModeling_RUNTIME vc9)
+    elseif(MSVC_VERSION EQUAL 1600)
+      set(StructuralModeling_RUNTIME vc10)
+      get_filename_component(VC_IDE_PATH $ENV{VS100COMNTOOLS}/../IDE ABSOLUTE)
+    elseif(MSVC_VERSION EQUAL 1700)
+      set(StructuralModeling_RUNTIME vc11)
+      get_filename_component(VC_IDE_PATH $ENV{VS110COMNTOOLS}/../IDE ABSOLUTE)
+    elseif(MSVC_VERSION EQUAL 1800)
+      set(StructuralModeling_RUNTIME vc12)
+      get_filename_component(VC_IDE_PATH $ENV{VS120COMNTOOLS}/../IDE ABSOLUTE)
+    endif()
+    get_filename_component(VC_PATH "${VC_IDE_PATH}/../../VC" ABSOLUTE)
+  endif()
+
+  cmaker_print_status("THE_DEPEDENCIES_BINARY_PATHS:${THE_DEPEDENCIES_BINARY_PATHS}")
+  list(APPEND THE_DEPEDENCIES_BINARY_PATHS "${VC_IDE_PATH}/../../VC" 
+"${VC_IDE_PATH}/../../VC/bin")
+  configure_file("${CMAKER_ROOT}/scripts/set_paths.bat.in" 
+                 "${CMAKE_CURRENT_BINARY_DIR}/set_paths.bat")
+  configure_file("${CMAKER_ROOT}/scripts/set_paths.bat.in" 
+                 "${THE_LIB_RUNTIME_OUTPUT_DIRECTORY}/set_paths.bat")
+  configure_file("${CMAKER_ROOT}/scripts/set_paths_and_run_vc.bat.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/set_paths_and_run_vc.bat")
+endif()
 
 # useful configuration (e.x.: put scripts in right places) =====================
 if(WIN32)

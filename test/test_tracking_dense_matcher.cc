@@ -14,11 +14,11 @@ int main () {
                 0.0f, 5.2556393630057437e+02, 2.6748068171871557e+02,
                 0.0f, 0.0f, 1.0f;
 
-  const std::string data_path = std::string(DVO_ROOT) + "/../data/rgbd_sequence";
+  const std::string data_path = std::string(DVO_ROOT) + "/data/rgbd_sequence";
   const std::string color_fn = std::string(DVO_ROOT) + 
-                         "/../data/rgbd_sequence/kinect_recorder_000000-color.png"; 
+                         "/data/rgbd_sequence/kinect_recorder_000000-color.png"; 
   const std::string depth_fn = std::string(DVO_ROOT) + 
-                         "/../data/rgbd_sequence/kinect_recorder_000000-depth.png"; 
+                         "/data/rgbd_sequence/kinect_recorder_000000-depth.png"; 
   cv::Mat color = cv::imread(color_fn);
   cv::Mat gray_img;
   cv::cvtColor(color, gray_img, CV_BGR2GRAY);

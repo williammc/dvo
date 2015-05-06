@@ -37,12 +37,13 @@ int main () {
   projection << 5.2921508098293293e+02, 0.0f, 3.2894272028759258e+02,
                 0.0f, 5.2556393630057437e+02, 2.6748068171871557e+02,
                 0.0f, 0.0f, 1.0f;
-#if 0
+#if 1
   const std::string path_prefix = std::string(DVO_ROOT) +
-    "/../data/rgbd_sequence";
+    "/data/rgbd_sequence";
+  std::string filename = path_prefix + "/kinect_recorder.txt";
 #elif 0
   const std::string path_prefix = std::string(DVO_ROOT) +
-    "/../data/rgbd_sequence_long";
+    "/data/rgbd_sequence_long";
   std::string filename = path_prefix + "/kinect_recorder.txt";
 #else
   const std::string path_prefix = "d:/data/structural_modeling/groundtruth/living_room_traj2_loop";
