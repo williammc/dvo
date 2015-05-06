@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(dvo)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+list(APPEND DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(DVO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DDVO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -45,33 +45,34 @@ include(DVODependencies_Config)
 
 # Slick
 set(Slick_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/slick-1.1)
-include_directories(${Slick_ROOT}/external/eigen-3.2.2 ${Slick_ROOT}/external/eigen-3.2.2/unsupported)
-include_directories(${Slick_ROOT})
+set(DVO_INC_DIRS ${Slick_ROOT}/external/eigen-3.2.2 ${Slick_ROOT}/external/eigen-3.2.2/unsupported)
+list(APPEND DVO_INC_DIRS ${Slick_ROOT})
 
 # Sophus
 find_path(Sophus_INCLUDE_DIR NAMES sophus/sophus.hpp
             PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../sophus)
-include_directories(${Sophus_INCLUDE_DIR})
+list(APPEND DVO_INC_DIRS ${Sophus_INCLUDE_DIR})
 
 ## Boost
 if(WIN32)
   set(Boost_USE_STATIC_LIBS  ON)
 endif(WIN32)
 
-find_package(Boost)
+find_package(Boost REQUIRED COMPONENTS serialization)
 
 if(NOT Boost_FOUND)
   cmaker_print_error("Cannot find boost")
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIR})
+list(APPEND DVO_INC_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND DVO_LIB_DIRS ${Boost_LIBRARY_DIR})
 cmaker_print_status("Boost libs: ${Boost_LIBRARIES}")
 
 # OpenCV
 ##  OpenCV
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+list(APPEND DVO_INC_DIRS ${OpenCV_INCLUDE_DIRS})
+list(APPEND DVO_LIB_DIRS ${OpenCV_LIB_DIR})
 list(APPEND DVO_EXTERNAL_LIBS ${OpenCV_LIBRARIES})
 cmaker_print_status("OpenCV include dirs:${OpenCV_INCLUDE_DIRS}")
 cmaker_print_status("OpenCV libs:${OpenCV_LIBRARIES}")
@@ -83,9 +84,10 @@ list(APPEND THE_DEPEDENCIES_BINARY_PATHS ${OpenCV_BINARY_DIR})
 # set(TBB_ARCH_PLATFORM "ia32")
 # set(TBB_COMPILER "vc12")
 find_package(TBB REQUIRED)
-include_directories(${TBB_INCLUDE_DIR})
+list(APPEND DVO_INC_DIRS ${TBB_INCLUDE_DIR})
 cmaker_cull_library_paths(TBB_LIBRARIES)
-list(APPEND SM_EXTERNAL_LIBS ${TBB_LIBRARIES})
+list(APPEND DVO_EXTERNAL_LIBS ${TBB_LIBRARIES})
+list(APPEND DVO_LIB_DIRS ${TBB_INSTALL_DIR}/lib/${TBB_ARCH_PLATFORM}/${TBB_COMPILER})
 link_directories(${TBB_INSTALL_DIR}/lib/${TBB_ARCH_PLATFORM}/${TBB_COMPILER})
 cmaker_print_status("Test tbb lib:${TBB_INSTALL_DIR}/lib/${TBB_ARCH_PLATFORM}/${TBB_COMPILER}")
 set(TBB_BINARY_DIR ${TBB_INSTALL_DIR}/bin/${TBB_ARCH_PLATFORM}/${TBB_COMPILER})
@@ -95,6 +97,10 @@ cmaker_print_status("TBB_LIBRARIES:${TBB_LIBRARIES}")
 cmaker_print_status("TBB_BINARY_DIR:${TBB_BINARY_DIR}")
 
 ##==============================================================================
+include_directories(${DVO_INC_DIRS})
+link_directories(${DVO_LIB_DIRS})
+set(DVO_INC_DIRS_PARENT_SCOPE ${DVO_INC_DIRS} PARENT_SCOPE)
+set(DVO_LIB_DIRS_PARENT_SCOPE ${DVO_LIB_DIRS} PARENT_SCOPE)
 set(sub_dirs . core util)
 
 set(REG_EXT "[^/]*([.]cpp|[.]c|[.]cc|[.]h|[.]hpp)$")
@@ -107,7 +113,7 @@ foreach(sub_dir ${sub_dirs})
 endforeach()
 
 ## The library =================================================================
-set(ALL_LIBRARIES ${DVO_EXTERNAL_LIBS} ${SM_EXTERNAL_LIBS})
+set(ALL_LIBRARIES ${DVO_EXTERNAL_LIBS})
 if(SM_USE_COTIRE)
   cmaker_add_library_cotire(dvo ${SM_LIB_TYPE} ${dvo_sources})
 else()
