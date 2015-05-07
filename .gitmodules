@@ -6,3 +6,7 @@
 	path = external/slick-1.1
 	url = https://github.com/williammc/Slick.git
 	branch = 1.1
+[submodule "external/sophus"]
+	path = external/sophus
+	url = https://github.com/williammc/sophus.git
+	branch = master
