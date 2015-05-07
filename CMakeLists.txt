@@ -45,13 +45,8 @@ include(DVODependencies_Config)
 
 # Slick
 set(Slick_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/slick-1.1)
-set(DVO_INC_DIRS ${Slick_ROOT}/external/eigen-3.2.2 ${Slick_ROOT}/external/eigen-3.2.2/unsupported)
+set(DVO_INC_DIRS ${Slick_ROOT} ${Slick_ROOT}/external/eigen-3.2.2 ${Slick_ROOT}/external/eigen-3.2.2/unsupported)
 list(APPEND DVO_INC_DIRS ${Slick_ROOT})
-
-# Sophus
-find_path(Sophus_INCLUDE_DIR NAMES sophus/sophus.hpp
-            PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../sophus)
-list(APPEND DVO_INC_DIRS ${Sophus_INCLUDE_DIR})
 
 ## Boost
 if(WIN32)

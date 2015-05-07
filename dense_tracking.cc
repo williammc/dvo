@@ -4,7 +4,7 @@
 #include <dvo/dense_tracking_impl.h>
 
 #include <assert.h>
-#include <sophus/se3.hpp>
+#include <slick/math/se3.h>
 
 #include <Eigen/Core>
 
@@ -118,11 +118,11 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   }
 
   // our first increment is the given guess
-  Sophus::SE3d inc(result.Transformation.rotation(),
+  slick::SE3d inc(result.Transformation.rotation(),
                    result.Transformation.translation());
 
-  Revertable<Sophus::SE3d> initial(inc);
-  Revertable<Sophus::SE3d> estimate;
+  Revertable<slick::SE3d> initial(inc);
+  Revertable<slick::SE3d> estimate;
 
   bool accept = true;
 
@@ -228,7 +228,7 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
       initial.update() = inc.inverse() * initial();
       estimate.update() = inc * estimate();
 
-      transformf = estimate().matrix().cast<float>();
+      transformf.matrix().block<3, 4>(0, 0) = estimate().get_matrix().cast<float>();
 
       if (debug) {
         dvo::core::computeResidualsAndValidFlagsSse(
