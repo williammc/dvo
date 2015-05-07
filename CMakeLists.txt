@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(dvo)
-list(APPEND DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..)
+get_filename_component(DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
 set(DVO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DDVO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -43,10 +43,11 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/DVODependencies_Config.cmake")
 endif()
 include(DVODependencies_Config)
 
-# Eigen
+# Slick
 set(Slick_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/slick-1.1)
-set(DVO_INC_DIRS ${Slick_ROOT} ${Slick_ROOT}/external/eigen-3.2.2
-                 ${Slick_ROOT}//external/eigen-3.2.2/unsupported)
+list(APPEND DVO_INC_DIRS ${Slick_ROOT}/external/eigen-3.2.2 
+                         ${Slick_ROOT}/external/eigen-3.2.2/unsupported
+                         ${Slick_ROOT})
 
 # Sophus
 list(APPEND DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/sophus)
