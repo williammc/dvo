@@ -6,3 +6,7 @@
 	path = external/sophus
 	url = https://github.com/williammc/sophus.git
 	branch = master
+[submodule "external/eigen-3.2.2"]
+	path = external/eigen-3.2.2
+	url = https://github.com/williammc/Eigen.git
+	branch = 3.2.2
