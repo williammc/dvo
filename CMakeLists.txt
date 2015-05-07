@@ -44,8 +44,9 @@ endif()
 include(DVODependencies_Config)
 
 # Eigen
-set(DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/eigen-3.2.2
-                 ${CMAKE_CURRENT_SOURCE_DIR}//external/eigen-3.2.2/unsupported)
+set(Slick_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external/slick-1.1)
+set(DVO_INC_DIRS ${Slick_ROOT} ${Slick_ROOT}/external/eigen-3.2.2
+                 ${Slick_ROOT}//external/eigen-3.2.2/unsupported)
 
 # Sophus
 list(APPEND DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/external/sophus)
