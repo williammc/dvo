@@ -70,9 +70,14 @@ cmaker_print_status("Boost libs: ${Boost_LIBRARIES}")
 # OpenCV
 ##  OpenCV
 find_package(OpenCV REQUIRED)
+set(OCV_LIBS)
+foreach(NAME ${OpenCV_LIBRARIES})
+  set(NAME ${NAME}${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH})
+  list(APPEND OCV_LIBS debug;${NAME}d;optimized;${NAME})
+endforeach()
 list(APPEND DVO_INC_DIRS ${OpenCV_INCLUDE_DIRS})
 list(APPEND DVO_LIB_DIRS ${OpenCV_LIB_DIR})
-list(APPEND DVO_EXTERNAL_LIBS ${OpenCV_LIBRARIES})
+list(APPEND DVO_EXTERNAL_LIBS ${OCV_LIBS})
 cmaker_print_status("OpenCV include dirs:${OpenCV_INCLUDE_DIRS}")
 cmaker_print_status("OpenCV libs:${OpenCV_LIBRARIES}")
 get_filename_component(OpenCV_BINARY_DIR "${OpenCV_LIB_DIR}/../bin" ABSOLUTE)
@@ -120,7 +125,9 @@ else()
 endif()
 set_property(TARGET dvo PROPERTY FOLDER "external/dvo")
 
-set(ALL_LIBRARIES dvo ${DVO_EXTERNAL_LIBS} )
+set(ALL_LIBRARIES dvo ${DVO_EXTERNAL_LIBS})
+set(DVO_ALL_LIBRARIES_PARENT_SCOPE ${ALL_LIBRARIES} PARENT_SCOPE)
+
 ## Tests
 set(tests test_tracking_dense_matcher
           test_tracking_dense_matcher_stream
