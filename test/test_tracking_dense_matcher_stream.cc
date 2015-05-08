@@ -4,6 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "dvo/dense_tracking.h"
+#include "dvo/util/stopwatch.h"
 #include "helpers.h"
 
 using Matrix34f = Eigen::Matrix < float, 3, 4 > ;
@@ -92,6 +93,9 @@ int main () {
   Eigen::Affine3d ref2cur;
   ref2cur.setIdentity();
 
+
+
+  dvo::util::stopwatch watch("DenseTracker::match()", 3);
   while (!stop) {
     index = (index == color_fns.size() - 1) ? 0 : index + 1;  // loopback
     //if (index == 0) {
@@ -113,10 +117,11 @@ int main () {
 
     current->Unload();
     // current->Load();
-
+    watch.start();
     dvo::DenseTracker::Result res;
     bool success = tracker->match(*reference, *current, res);
     ref2cur = res.Transformation.inverse();
+    watch.stopAndPrint();
 
     std::cout << "TrackResult:" << dvo::DenseTracker::Result::ToString(res.Status) << std::endl;
     std::cout << "Tracked pose:\n" << ref2cur.matrix() << std::endl;

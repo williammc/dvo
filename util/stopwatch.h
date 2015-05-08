@@ -17,16 +17,14 @@ private:
   int64_t begin;
   int count;
   int interval;
-  boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> > acc;
+  boost::accumulators::accumulator_set<
+      double, boost::accumulators::stats<boost::accumulators::tag::mean>> acc;
 
 public:
-  stopwatch(std::string name, int interval = 500) 
-  : name(name + ": "), count(0), interval(interval) {
-  }
+  stopwatch(std::string name, int interval = 500)
+      : name(name + ": "), count(0), interval(interval) {}
 
-  inline void start() {
-    begin = cv::getTickCount();
-  }
+  inline void start() { begin = cv::getTickCount(); }
 
   inline void stop() {
     int64_t duration = cv::getTickCount() - begin;
@@ -37,12 +35,12 @@ public:
   }
 
   inline void print() {
+    const double m = boost::accumulators::mean(acc);
+    printf("stopwatch: %s %fseconds (%dsamples)\n", name.c_str(), m, interval);
     if (count == interval) {
-      double m = boost::accumulators::mean(acc);
-      std::cerr  << name << m << std::endl;
-
       // reset
-      acc = boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> >();
+      acc = boost::accumulators::accumulator_set<
+          double, boost::accumulators::stats<boost::accumulators::tag::mean>>();
       count = 0;
     }
   }
@@ -55,8 +53,9 @@ public:
 
 struct stopwatch_collection {
 public:
-  stopwatch_collection(const size_t num, std::string base_name, int interval = 500) : num(num)
-  {
+  stopwatch_collection(const size_t num, std::string base_name,
+                       int interval = 500)
+      : num(num) {
     std::stringstream name;
 
     for (size_t idx = 0; idx < num; ++idx) {
@@ -73,13 +72,12 @@ public:
       delete watches[idx];
   }
 
-  stopwatch& operator[](int idx) {
-    return *watches[idx];
-  }
+  stopwatch &operator[](int idx) { return *watches[idx]; }
+
 private:
   size_t num;
-  std::vector<stopwatch*> watches;
+  std::vector<stopwatch *> watches;
 };
 
-}  // namespace util
-}  // namespace dvo
+} // namespace util
+} // namespace dvo

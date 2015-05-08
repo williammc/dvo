@@ -40,9 +40,10 @@ public:
                          const float &idx, const float &idy, const float &zdx,
                          const float &zdy) const {
     return z == z && zdx == zdx && zdy == zdy &&
-           (std::abs(idx) > intensity_threshold ||
-            std::abs(idy) > intensity_threshold ||
-            std::abs(zdx) > depth_threshold || std::abs(zdy) > depth_threshold);
+           (std::fabs(idx) > intensity_threshold ||
+            std::fabs(idy) > intensity_threshold ||
+            std::fabs(zdx) > depth_threshold ||
+            std::fabs(zdy) > depth_threshold);
   }
 };
 

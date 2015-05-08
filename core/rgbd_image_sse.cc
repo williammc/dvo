@@ -170,15 +170,16 @@ void RgbdImage::warpIntensitySseImpl(const AffineTransform &transformationx,
   const __m128 t2 = _mm_load_ps(transformation.data() + 4);
   const __m128 t3 = _mm_load_ps(transformation.data() + 8);
 
-  const __m128 fxyxy =
-      _mm_setr_ps(projection(0, 0), projection(1, 1), projection(0, 0),
-                  projection(1, 1)); // [fx, fy, fx, fy]
-  const __m128 oxyxy =
-      _mm_setr_ps(projection(0, 2), projection(1, 2), projection(0, 2),
-                  projection(1, 2)); // [ox, oy, ox, oy]
+  const __m128 fxyxy = _mm_setr_ps(
+      float(projection(0, 0)), float(projection(1, 1)), float(projection(0, 0)),
+      float(projection(1, 1))); // [fx, fy, fx, fy]
+  const __m128 oxyxy = _mm_setr_ps(
+      float(projection(0, 2)), float(projection(1, 2)), float(projection(0, 2)),
+      float(projection(1, 2))); // [ox, oy, ox, oy]
 
   const __m128 img_lower_bound = _mm_setzero_ps();
-  const __m128 img_upper_bound = _mm_set_ps(height_, width_, height_, width_);
+  const __m128 img_upper_bound =
+      _mm_set_ps(float(height_), float(width_), float(height_), float(width_));
 
   __m128 point1, point2, xy, uv, zw, xyuv, zwzw, z1w1, zzww, zzww_rcp,
       xyuv_proj, xyuv_inimage;

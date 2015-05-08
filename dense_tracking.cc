@@ -165,8 +165,11 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   Eigen::Matrix2f precision;
   precision.setZero();
   result.Statistics.Levels.reserve(4);
+
+  dvo::util::stopwatch watch("match() iterations", 3);
   for (itctx_.Level = cfg.FirstLevel; itctx_.Level >= cfg.LastLevel;
        --itctx_.Level) {
+    watch.start();
     result.Statistics.Levels.push_back(LevelStats());
     LevelStats &level_stats = result.Statistics.Levels.back();
 
@@ -185,12 +188,12 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
     // i z idx idy zdx zdy
     float wcur_id = 0.5f, wref_id = 0.5f, wcur_zd = 1.0f, wref_zd = 0.0f;
 
-    wcur << 1.0f / 255.0f, 1.0f, wcur_id *K(0, 0) / 255.0f,
-        wcur_id * K(1, 1) / 255.0f, wcur_zd * K(0, 0), wcur_zd * K(1, 1), 0.0f,
-        0.0f;
-    wref << -1.0f / 255.0f, -1.0f, wref_id *K(0, 0) / 255.0f,
-        wref_id * K(1, 1) / 255.0f, wref_zd * K(0, 0), wref_zd * K(1, 1), 0.0f,
-        0.0f;
+    wcur << 1.0f / 255.0f, 1.0f, wcur_id *float(K(0, 0)) / 255.0f,
+        wcur_id * float(K(1, 1)) / 255.0f, wcur_zd * float(K(0, 0)),
+        wcur_zd * float(K(1, 1)), 0.0f, 0.0f;
+    wref << -1.0f / 255.0f, -1.0f, wref_id *float(K(0, 0)) / 255.0f,
+        wref_id * float(K(1, 1)) / 255.0f, wref_zd * float(K(0, 0)),
+        wref_zd * float(K(1, 1)), 0.0f, 0.0f;
 
     PointSelection::PointIterator first_point, last_point;
     reference.select(itctx_.Level, first_point, last_point);
@@ -343,6 +346,8 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
     if (itctx_.IterationsExceeded())
       level_stats.TerminationCriterion =
           TerminationCriteria::IterationsExceeded;
+
+    watch.stopAndPrint();
   }
   LevelStats &last_level = result.Statistics.Levels.back();
   IterationStats &last_iteration =
@@ -426,12 +431,12 @@ cv::Mat DenseTracker::computeIntensityErrorImage(
   // i z idx idy zdx zdy
   float wcur_id = 0.5f, wref_id = 0.5f, wcur_zd = 1.0f, wref_zd = 0.0f;
 
-  wcur << 1.0f / 255.0f, 1.0f, wcur_id *K(0, 0) / 255.0f,
-      wcur_id * K(1, 1) / 255.0f, wcur_zd * K(0, 0), wcur_zd * K(1, 1), 0.0f,
-      0.0f;
-  wref << -1.0f / 255.0f, -1.0f, wref_id *K(0, 0) / 255.0f,
-      wref_id * K(1, 1) / 255.0f, wref_zd * K(0, 0), wref_zd * K(1, 1), 0.0f,
-      0.0f;
+  wcur << 1.0f / 255.0f, 1.0f, wcur_id *float(K(0, 0)) / 255.0f,
+      wcur_id * float(K(1, 1)) / 255.0f, wcur_zd * float(K(0, 0)),
+      wcur_zd * float(K(1, 1)), 0.0f, 0.0f;
+  wref << -1.0f / 255.0f, -1.0f, wref_id *float(K(0, 0)) / 255.0f,
+      wref_id * float(K(1, 1)) / 255.0f, wref_zd * float(K(0, 0)),
+      wref_zd * float(K(1, 1)), 0.0f, 0.0f;
 
   ComputeResidualsResult compute_residuals_result;
   compute_residuals_result.first_point_error = points_error.begin();
