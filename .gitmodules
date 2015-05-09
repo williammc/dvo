@@ -1,11 +1,12 @@
 [submodule "external/cmaker"]
 	path = external/cmaker
 	url = https://github.com/williammc/cmaker.git
-
+	branch = master
 [submodule "external/slick-1.1"]
 	path = external/slick-1.1
-	url = https://github.com/williammc/Slick.git
+	url = git@gitlab.icg.tugraz.at:thanh.nguyen/slick.git
 	branch = 1.1
 [submodule "external/sophus"]
 	path = external/sophus
 	url = https://github.com/williammc/sophus.git
+	branch = master
