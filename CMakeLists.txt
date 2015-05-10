@@ -178,6 +178,7 @@ if(WIN32)
                  "${THE_LIB_RUNTIME_OUTPUT_DIRECTORY}/set_paths.bat")
   configure_file("${CMAKER_ROOT}/scripts/set_paths_and_run_vc.bat.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/set_paths_and_run_vc.bat")
+  set(DVO_THE_DEPEDENCIES_BINARY_PATHS_PARENT_SCOPE ${THE_DEPEDENCIES_BINARY_PATHS} PARENT_SCOPE)
 endif()
 
 # useful configuration (e.x.: put scripts in right places) =====================

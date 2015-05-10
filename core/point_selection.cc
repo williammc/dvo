@@ -19,7 +19,7 @@
  *  along with dvo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <dvo/core/point_selection.h>
+#include "dvo/core/point_selection.h"
 
 namespace dvo {
 namespace core {

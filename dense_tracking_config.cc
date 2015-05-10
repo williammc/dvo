@@ -1,4 +1,4 @@
-#include <dvo/dense_tracking.h>
+#include "dvo/dense_tracking.h"
 #include <Eigen/Eigenvalues>
 
 namespace dvo {
@@ -11,7 +11,7 @@ DenseTracker::Config::Config()
           dvo::core::TDistributionInfluenceFunction::DEFAULT_DOF),
       ScaleEstimatorType(dvo::core::ScaleEstimators::TDistribution),
       ScaleEstimatorParam(dvo::core::TDistributionScaleEstimator::DEFAULT_DOF),
-      IntensityDerivativeThreshold(10.0f), DepthDerivativeThreshold(0.01f) {}
+      IntensityDerivativeThreshold(0.0f), DepthDerivativeThreshold(0.00f) {}
 
 size_t DenseTracker::Config::getNumLevels() const { return FirstLevel + 1; }
 
@@ -19,6 +19,28 @@ bool DenseTracker::Config::UseEstimateSmoothing() const { return Mu > 1e-6; }
 
 bool DenseTracker::Config::IsSane() const { return FirstLevel >= LastLevel; }
 
+void DenseTracker::Config::Print() const {
+  std::cout << "DenseTracker::Config:\n"
+      << "First Level = " << FirstLevel
+      << ", Last Level = " << LastLevel
+      << ", Max Iterations per Level = " << MaxIterationsPerLevel
+      << ", Precision = " << Precision << ", Mu = " << Mu
+      << ", Use Initial Estimate = "
+      << (UseInitialEstimate ? "true" : "false")
+      << ", Use Weighting = " << (UseWeighting ? "true" : "false")
+      << ", Scale Estimator = "
+      << dvo::core::ScaleEstimators::str(ScaleEstimatorType)
+      << ", Scale Estimator Param = " << ScaleEstimatorParam
+      << ", Influence Function = "
+      << dvo::core::InfluenceFunctions::str(InfluenceFuntionType)
+      << ", Influence Function Param = " << InfluenceFunctionParam
+      << ", Intensity Derivative Threshold = "
+      << IntensityDerivativeThreshold
+      << ", Depth Derivative Threshold = " << DepthDerivativeThreshold 
+      << "\n";
+}
+
+// IteractionContext ===========================================================
 DenseTracker::IterationContext::IterationContext(const Config &cfg)
     : cfg(cfg) {}
 
@@ -48,6 +70,7 @@ bool DenseTracker::IterationContext::IterationsExceeded() const {
   return Iteration >= max_iterations;
 }
 
+// Result ======================================================================
 bool DenseTracker::Result::isNaN() const {
   return !std::isfinite(Transformation.matrix().sum()) ||
          !std::isfinite(Information.sum());
@@ -69,6 +92,7 @@ void DenseTracker::Result::setIdentity() {
 
 void DenseTracker::Result::clearStatistics() { Statistics.Levels.clear(); }
 
+// IterationStats ==============================================================
 void DenseTracker::IterationStats::InformationEigenValues(
     dvo::core::Vector6d &eigenvalues) const {
   Eigen::EigenSolver<dvo::core::Matrix6d> evd(EstimateInformation);
@@ -83,6 +107,7 @@ double DenseTracker::IterationStats::InformationConditionNumber() const {
   return std::abs(ev(5) / ev(0));
 }
 
+// LevelStats ==================================================================
 bool DenseTracker::LevelStats::HasIterationWithIncrement() const {
   int min =
       TerminationCriterion ==

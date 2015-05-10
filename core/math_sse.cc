@@ -19,7 +19,7 @@
  *  along with dvo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <dvo/core/math_sse.h>
+#include "dvo/core/math_sse.h"
 
 #ifdef __CDT_PARSER__
 #define __SSE3__

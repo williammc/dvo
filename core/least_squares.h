@@ -2,8 +2,8 @@
 #include <Eigen/Core>
 #include <opencv2/core/core.hpp>
 
-#include <dvo/core/datatypes.h>
-#include <dvo/core/math_sse.h>
+#include "dvo/core/datatypes.h"
+#include "dvo/core/math_sse.h"
 
 namespace dvo {
 namespace core {

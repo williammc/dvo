@@ -19,12 +19,12 @@
  *  along with dvo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <dvo/core/least_squares.h>
+#include "dvo/core/least_squares.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
 #include <Eigen/SVD>
-#include <dvo/core/math_sse.h>
+#include "dvo/core/math_sse.h"
 
 static const dvo::core::NumType normalizer = 1.0 / (255.0 * 255.0);
 static const dvo::core::NumType normalizer_inverse = 255.0 * 255.0;

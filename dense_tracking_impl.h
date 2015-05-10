@@ -1,14 +1,14 @@
 #pragma once
 
-#include <dvo/dense_tracking.h>
+#include "dvo/dense_tracking.h"
 
 namespace dvo {
 namespace core {
 
-typedef PointWithIntensityAndDepth::VectorType::iterator PointIterator;
-typedef DenseTracker::ResidualVectorType::iterator ResidualIterator;
-typedef DenseTracker::WeightVectorType::iterator WeightIterator;
-typedef std::vector<uint8_t>::iterator ValidFlagIterator;
+using PointIterator = PointWithIntensityAndDepth::VectorType::iterator;
+using ResidualIterator= DenseTracker::ResidualVectorType::iterator;
+using WeightIterator = DenseTracker::WeightVectorType::iterator;
+using ValidFlagIterator = std::vector<uint8_t>::iterator;
 
 struct ComputeResidualsResult {
   PointIterator first_point_error;

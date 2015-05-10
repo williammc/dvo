@@ -113,11 +113,11 @@ int main () {
     depth.convertTo(depth, CV_32FC1);
     depth = depth * 0.001;  // to meter unit
 
+    watch.start();
     auto current = camera->create(intensity, depth);
 
-    current->Unload();
+    // current->Unload();
     // current->Load();
-    watch.start();
     dvo::DenseTracker::Result res;
     bool success = tracker->match(*reference, *current, res);
     ref2cur = res.Transformation.inverse();

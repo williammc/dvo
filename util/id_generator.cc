@@ -18,7 +18,7 @@
  *  along with dvo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <dvo/util/id_generator.h>
+#include "dvo/util/id_generator.h"
 
 namespace dvo
 {

@@ -1,10 +1,8 @@
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range.h>
 
-#include <dvo/core/weight_calculation.h>
-
-#include <dvo/util/histogram.h>
-//#include <visualization/visualizer.h>
+#include "dvo/core/weight_calculation.h"
+#include "dvo/util/histogram.h"
 
 namespace dvo {
 namespace core {

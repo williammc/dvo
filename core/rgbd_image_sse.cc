@@ -1,6 +1,6 @@
-#include <dvo/core/datatypes.h>
-#include <dvo/core/rgbd_image.h>
-#include <dvo/core/interpolation.h>
+#include "dvo/core/datatypes.h"
+#include "dvo/core/rgbd_image.h"
+#include "dvo/core/interpolation.h"
 
 #ifndef __APPLE__
 #include <immintrin.h>

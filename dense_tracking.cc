@@ -1,18 +1,17 @@
-#include <iomanip>
-
-#include <dvo/dense_tracking.h>
-#include <dvo/dense_tracking_impl.h>
+#include "dvo/dense_tracking.h"
+#include "dvo/dense_tracking_impl.h"
 
 #include <assert.h>
-#include <sophus/se3.hpp>
+#include <iomanip>
 
 #include <Eigen/Core>
+#include <sophus/se3.hpp>
 
-#include <dvo/core/datatypes.h>
-#include <dvo/util/revertable.h>
-#include <dvo/util/stopwatch.h>
-#include <dvo/util/id_generator.h>
-#include <dvo/util/histogram.h>
+#include "dvo/core/datatypes.h"
+#include "dvo/util/revertable.h"
+#include "dvo/util/stopwatch.h"
+#include "dvo/util/id_generator.h"
+#include "dvo/util/histogram.h"
 
 namespace dvo {
 
@@ -365,8 +364,8 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
     last_iteration.Error, last_iteration.WeightedError, 
     last_iteration.ValidConstraintsRatio, 
     float(last_iteration.ValidConstraints)/last_level.MaxValidPixels);
-  const float visible_ratio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
-  
+  float visible_ratio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
+  visible_ratio = 1.0f;
   if (last_iteration.WeightedError < 1.0f &&
       last_iteration.ValidConstraintsRatio > 0.6f &&
       visible_ratio > 0.6f)

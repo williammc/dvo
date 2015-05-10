@@ -4,17 +4,42 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include <dvo/core/datatypes.h>
-#include <dvo/core/rgbd_image.h>
-#include <dvo/core/point_selection.h>
-#include <dvo/core/least_squares.h>
-#include <dvo/core/weight_calculation.h>
+#include "dvo/core/datatypes.h"
+#include "dvo/core/rgbd_image.h"
+#include "dvo/core/point_selection.h"
+#include "dvo/core/least_squares.h"
+#include "dvo/core/weight_calculation.h"
 
 namespace dvo {
 
 class DVO_API DenseTracker {
 public:
   struct DVO_API Config {
+    Config();
+
+    size_t getNumLevels() const;
+
+    bool UseEstimateSmoothing() const;
+
+    bool IsSane() const;
+
+    void Print() const;
+
+    template <class Archive>
+    void serialize(Archive &ar, const unsigned int version) {
+      ar &FirstLevel;
+      ar &LastLevel;
+      ar &MaxIterationsPerLevel;
+      ar &Precision;
+      ar &Mu;
+      ar &UseInitialEstimate;
+      ar &UseParallel;
+      ar &InfluenceFuntionType;
+      ar &InfluenceFunctionParam;
+      ar &IntensityDerivativeThreshold;
+      ar &DepthDerivativeThreshold;
+    }
+
     int FirstLevel, LastLevel;
     int MaxIterationsPerLevel;
     double Precision;
@@ -33,28 +58,6 @@ public:
 
     float IntensityDerivativeThreshold;
     float DepthDerivativeThreshold;
-
-    Config();
-    size_t getNumLevels() const;
-
-    bool UseEstimateSmoothing() const;
-
-    bool IsSane() const;
-
-    template <class Archive>
-    void serialize(Archive &ar, const unsigned int version) {
-      ar &FirstLevel;
-      ar &LastLevel;
-      ar &MaxIterationsPerLevel;
-      ar &Precision;
-      ar &Mu;
-      ar &UseInitialEstimate;
-      ar &UseParallel;
-      ar &InfluenceFuntionType;
-      ar &InfluenceFunctionParam;
-      ar &IntensityDerivativeThreshold;
-      ar &DepthDerivativeThreshold;
-    }
   };
 
   struct DVO_API TerminationCriteria {
@@ -88,8 +91,7 @@ public:
 
     double InformationConditionNumber() const;
   };
-  typedef std::vector<IterationStats, Eigen::aligned_allocator<IterationStats>>
-      IterationStatsVector;
+  using IterationStatsVector = std::vector<IterationStats, Eigen::aligned_allocator<IterationStats>>;
 
   struct DVO_API LevelStats {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -105,8 +107,7 @@ public:
     const IterationStats &LastIterationWithIncrement() const;
     const IterationStats &LastIteration() const;
   };
-  typedef std::vector<LevelStats, Eigen::aligned_allocator<LevelStats>>
-      LevelStatsVector;
+  using LevelStatsVector = std::vector<LevelStats, Eigen::aligned_allocator<LevelStats>>;
 
   struct DVO_API Stats {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -200,10 +201,9 @@ public:
   compute3rdRowOfJacobianOfTransformation(const dvo::core::Vector4 &p,
                                           dvo::core::Vector6 &j);
 
-  typedef std::vector<Eigen::Vector2f,
-                      Eigen::aligned_allocator<Eigen::Vector2f>>
-      ResidualVectorType;
-  typedef std::vector<float, Eigen::aligned_allocator<float>> WeightVectorType;
+  using ResidualVectorType = std::vector<Eigen::Vector2f,
+                      Eigen::aligned_allocator<Eigen::Vector2f>>;
+  using WeightVectorType = std::vector<float, Eigen::aligned_allocator<float>>;
 
 private:
   struct IterationContext {

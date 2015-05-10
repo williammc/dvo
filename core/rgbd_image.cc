@@ -2,8 +2,8 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <dvo/core/rgbd_image.h>
-#include <dvo/core/interpolation.h>
+#include "dvo/core/rgbd_image.h"
+#include "dvo/core/interpolation.h"
 
 namespace dvo {
 namespace core {

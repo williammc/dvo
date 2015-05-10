@@ -2,8 +2,8 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <dvo/core/datatypes.h>
-#include <dvo/util/fluent_interface.h>
+#include "dvo/core/datatypes.h"
+#include "dvo/util/fluent_interface.h"
 
 namespace dvo {
 namespace core {

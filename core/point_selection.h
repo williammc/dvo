@@ -1,8 +1,7 @@
 #pragma once
 
-#include <dvo/core/rgbd_image.h>
-
-#include <dvo/dvo_api.h>
+#include "dvo/core/rgbd_image.h"
+#include "dvo/dvo_api.h"
 
 namespace dvo {
 namespace core {
