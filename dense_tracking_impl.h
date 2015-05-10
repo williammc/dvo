@@ -1,5 +1,5 @@
 #pragma once
-
+#include <array>
 #include "dvo/dense_tracking.h"
 
 namespace dvo {
@@ -11,6 +11,11 @@ using WeightIterator = DenseTracker::WeightVectorType::iterator;
 using ValidFlagIterator = std::vector<uint8_t>::iterator;
 
 struct ComputeResidualsResult {
+  ComputeResidualsResult() {
+    valid_points_bbox = std::array<float, 4>{
+        std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::min(), std::numeric_limits<float>::min()};
+  }
   PointIterator first_point_error;
   PointIterator last_point_error;
 
@@ -19,6 +24,8 @@ struct ComputeResidualsResult {
 
   ValidFlagIterator first_valid_flag;
   ValidFlagIterator last_valid_flag;
+  /// minx, miny, maxx, maxy
+  std::array<float, 4> valid_points_bbox; ///< bounding box of valid points
 };
 
 void computeResiduals(const PointIterator &first_point,

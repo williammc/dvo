@@ -166,6 +166,8 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   result.Statistics.Levels.reserve(4);
 
   dvo::util::stopwatch watch("match() iterations", 3);
+  std::array<float, 4> last_bbox;
+  int last_level_tmp = 0;
   for (itctx_.Level = cfg.FirstLevel; itctx_.Level >= cfg.LastLevel;
        --itctx_.Level) {
     watch.start();
@@ -179,7 +181,8 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
     // levels are not comparable
     itctx_.Iteration = 0;
     itctx_.Error = std::numeric_limits<double>::max();
-
+    
+    last_level_tmp = itctx_.Level;
     RgbdImage &cur = *current.level(itctx_.Level);
     const auto &K = cur.camera().projection();
 
@@ -241,6 +244,7 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
                                        transformf, wref, wcur,
                                        compute_residuals_result);
       }
+      last_bbox = compute_residuals_result.valid_points_bbox;
       size_t n = (compute_residuals_result.last_residual -
                   compute_residuals_result.first_residual);
       iter_stats.ValidConstraints = n;
@@ -355,6 +359,11 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
           ? last_level.Iterations[last_level.Iterations.size() - 1]
           : last_level.Iterations[last_level.Iterations.size() - 2];
 
+  int curr_area = current.level(last_level_tmp)->width()*current.level(last_level_tmp)->height();
+  float bbox_area =
+      (last_bbox[2] - last_bbox[0]) * (last_bbox[3] - last_bbox[1]);
+  float visible_ratio = bbox_area / curr_area;
+
   result.Transformation = estimate().inverse().matrix();
   result.Information = last_iteration.EstimateInformation * 0.008 * 0.008;
   result.LogLikelihood = last_iteration.TDistributionLogLikelihood +
@@ -362,9 +371,8 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   printf("Tracking Statistics:\n");
   printf("Error:%f, WeightedError:%f, ValidConstraintsRatio:%f, VisibleRatio:%f",
     last_iteration.Error, last_iteration.WeightedError, 
-    last_iteration.ValidConstraintsRatio, 
-    float(last_iteration.ValidConstraints)/last_level.MaxValidPixels);
-  float visible_ratio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
+    last_iteration.ValidConstraintsRatio, visible_ratio);
+  // float visible_ratio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
   visible_ratio = 1.0f;
   if (last_iteration.WeightedError < 1.0f &&
       last_iteration.ValidConstraintsRatio > 0.6f &&

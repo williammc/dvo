@@ -269,6 +269,12 @@ void computeResidualsSse(
           _mm_store_ps(result.last_point_error->intensity_and_depth.data + 4,
                        residual_b);
 
+          result.valid_points_bbox[0] = std::min(result.valid_points_bbox[0], (float)address[0]);
+          result.valid_points_bbox[1] = std::min(result.valid_points_bbox[1], (float)address[1]);
+
+          result.valid_points_bbox[2] = std::max(result.valid_points_bbox[2], (float)address[0]);
+          result.valid_points_bbox[3] = std::max(result.valid_points_bbox[3], (float)address[1]);
+
           ++result.last_point_error;
           ++result.last_residual;
         } else {
