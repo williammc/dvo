@@ -140,7 +140,7 @@ set(tests test_tracking_dense_matcher
           #test_tracking_dense_matcher_live
           )
 foreach(test ${tests})
-  add_executable(${test} test/${test}.cc)
+  add_executable(${test} dvo/test/${test}.cc)
   target_link_libraries(${test} dvo  ${DVO_EXTERNAL_LIBS})
   set_property(TARGET ${test} PROPERTY FOLDER "external/dvo/tests")
   if(SM_USE_COTIRE)

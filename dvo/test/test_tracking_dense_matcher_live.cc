@@ -8,7 +8,7 @@
 #include "sense/util.h"
 
 #include "dvo/dense_tracking.h"
-#include "helpers.h"
+#include "dvo/test/helpers.h"
 
 using Matrix34f = Eigen::Matrix < float, 3, 4 > ;
 using Vec4f = Eigen::Matrix < float, 4, 1 >;

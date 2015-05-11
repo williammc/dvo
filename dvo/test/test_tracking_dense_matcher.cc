@@ -4,7 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "dvo/dense_tracking.h"
-#include "test/helpers.h"
+#include "dvo/test/helpers.h"
 
 int main () {
   int camera_width = 640;
