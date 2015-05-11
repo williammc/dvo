@@ -359,10 +359,10 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
           ? last_level.Iterations[last_level.Iterations.size() - 1]
           : last_level.Iterations[last_level.Iterations.size() - 2];
 
-  int curr_area = current.level(last_level_tmp)->width()*current.level(last_level_tmp)->height();
-  float bbox_area =
+  const int curr_area = current.level(last_level_tmp)->width()*current.level(last_level_tmp)->height();
+  const float bbox_area =
       (last_bbox[2] - last_bbox[0]) * (last_bbox[3] - last_bbox[1]);
-  float visible_ratio = bbox_area / curr_area;
+  result.VisibleRatio = bbox_area / curr_area;
 
   result.Transformation = estimate().inverse().matrix();
   result.Information = last_iteration.EstimateInformation * 0.008 * 0.008;
@@ -371,35 +371,35 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   printf("Tracking Statistics:\n");
   printf("Error:%f, WeightedError:%f, ValidConstraintsRatio:%f, VisibleRatio:%f",
     last_iteration.Error, last_iteration.WeightedError, 
-    last_iteration.ValidConstraintsRatio, visible_ratio);
-  // float visible_ratio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
-  visible_ratio = 1.0f;
+    last_iteration.ValidConstraintsRatio, result.VisibleRatio);
+  // float result.VisibleRatio = float(last_iteration.ValidConstraints)/last_level.MaxValidPixels;
+  result.VisibleRatio = 1.0f;
   if (last_iteration.WeightedError < 1.0f &&
       last_iteration.ValidConstraintsRatio > 0.6f &&
-      visible_ratio > 0.6f)
+      result.VisibleRatio > 0.6f)
     result.Status = Result::TrackStatus::GOOD;
 #if 0 // for imperial dataset
   else if (last_iteration.WeightedError < 1.5f &&
            last_iteration.ValidConstraintsRatio > 0.5f &&
-           visible_ratio > 0.5f)
+           result.VisibleRatio > 0.5f)
     result.Status = Result::TrackStatus::OK;
 #else // for recording datasets
   else if (last_iteration.WeightedError < 2.0f &&
            last_iteration.ValidConstraintsRatio > 0.6f &&
-           visible_ratio > 0.6f)
+           result.VisibleRatio > 0.6f)
     result.Status = Result::TrackStatus::OK;
   else if (last_iteration.WeightedError < 1.2f &&
            last_iteration.ValidConstraintsRatio > 0.5f &&
-           visible_ratio > 0.3f)
+           result.VisibleRatio > 0.3f)
     result.Status = Result::TrackStatus::OK;
   // else if (last_iteration.WeightedError < 2.0f &&
   //          last_iteration.ValidConstraintsRatio > 0.7f &&
-  //          visible_ratio > 0.3f)
+  //          result.VisibleRatio > 0.3f)
   //   result.Status = Result::TrackStatus::OK;
 #endif
   // else if (last_iteration.WeightedError < 2.0f &&
   //          last_iteration.ValidConstraintsRatio > 0.5f &&
-  //          visible_ratio > 0.5f)
+  //          result.VisibleRatio > 0.5f)
   //   result.Status = Result::TrackStatus::BAD;
   else
     result.Status = Result::TrackStatus::FAILURE;

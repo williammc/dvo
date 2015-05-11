@@ -127,6 +127,7 @@ public:
     dvo::core::AffineTransformd Transformation;
     dvo::core::Matrix6d Information;
     double LogLikelihood;
+    float VisibleRatio;
 
     Stats Statistics;
 
