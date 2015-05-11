@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(dvo)
-get_filename_component(DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
+get_filename_component(DVO_INC_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 set(DVO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DDVO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -115,8 +115,8 @@ set(sub_dirs . core util)
 
 set(REG_EXT "[^/]*([.]cpp|[.]c|[.]cc|[.]h|[.]hpp)$")
 foreach(sub_dir ${sub_dirs})
-  file(GLOB dvo_${sub_dir}_sources "${CMAKE_CURRENT_SOURCE_DIR}/${sub_dir}/*.cc")
-  file(GLOB dvo_${sub_dir}_headers "${CMAKE_CURRENT_SOURCE_DIR}/${sub_dir}/*.h")
+  file(GLOB dvo_${sub_dir}_sources "${CMAKE_CURRENT_SOURCE_DIR}/dvo/${sub_dir}/*.cc")
+  file(GLOB dvo_${sub_dir}_headers "${CMAKE_CURRENT_SOURCE_DIR}/dvo/${sub_dir}/*.h")
   list(APPEND dvo_sources ${dvo_${sub_dir}_sources}
                             ${dvo_${sub_dir}_headers})
   source_group("${sub_dir}" REGULAR_EXPRESSION "${CMAKE_CURRENT_SOURCE_DIR}/${sub_dir}/${REG_EXT}")
