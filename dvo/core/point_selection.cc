@@ -131,6 +131,9 @@ PointSelection::PointIterator PointSelection::selectPointsFromImage(
     }
   }
 
+  if (!grid_filter_)
+    return selected_points_it;
+
   GridHashBase<PerPointData> gridhash(img.width(), img.height(), 5);
   for (auto d : ppdata) {
     gridhash.insert(d.x, d.y, d);
@@ -146,13 +149,13 @@ PointSelection::PointIterator PointSelection::selectPointsFromImage(
     els.push_back(e);
   }
 
-  auto tmp_it = first_point;
+  auto grid_it = first_point;
   for (int i = 0; i < int(els.size()); ++i) {
-    *tmp_it = *(tmp_it + els[i].idx);
-    tmp_it++;
+    *grid_it = *(grid_it + els[i].idx);
+    grid_it++;
   }
 
-  return tmp_it;
+  return grid_it;
 }
 
 PointSelection::Storage::Storage()
