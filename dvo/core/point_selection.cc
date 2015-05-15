@@ -1,35 +1,15 @@
-/**
- *  This file is part of dvo.
- *
- *  Copyright 2013 Christian Kerl <christian.kerl@in.tum.de> (Technical
- *University of Munich)
- *  For more information see <http://vision.in.tum.de/data/software/dvo>.
- *
- *  dvo is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  dvo is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with dvo.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "dvo/core/point_selection.h"
+#include "dvo/core/grid_hash.h"
 
 namespace dvo {
 namespace core {
 
 PointSelection::PointSelection(const PointSelectionPredicate &predicate)
-    : pyramid_(0), predicate_(predicate), debug_(false) {}
+    : pyramid_(0), predicate_(predicate), debug_(false), grid_filter_(false) {}
 
 PointSelection::PointSelection(dvo::core::RgbdImagePyramid &pyramid,
                                const PointSelectionPredicate &predicate)
-    : pyramid_(&pyramid), predicate_(predicate), debug_(false) {}
+    : pyramid_(&pyramid), predicate_(predicate), debug_(false), grid_filter_(false) {}
 
 PointSelection::~PointSelection() {}
 
@@ -97,24 +77,32 @@ void PointSelection::select(const size_t &level,
   last_point = storage.points_end;
 }
 
+struct PerPointData {
+  int x, y;
+  int idx;
+  double value;
+};
+
 PointSelection::PointIterator PointSelection::selectPointsFromImage(
     const dvo::core::RgbdImage &img,
     const PointSelection::PointIterator &first_point,
     const PointSelection::PointIterator &last_point, cv::Mat &debug_idx) {
-  const PointWithIntensityAndDepth::Point *points =
+  const auto *points =
       (const PointWithIntensityAndDepth::Point *)img.pointcloud().data();
 #ifndef __APPLE__
-  const PointWithIntensityAndDepth::IntensityAndDepth *intensity_and_depth =
+  const auto *intensity_and_depth =
       img.acceleration().ptr<PointWithIntensityAndDepth::IntensityAndDepth>();
 #else
-  const PointWithIntensityAndDepth::IntensityAndDepth *intensity_and_depth =
+  const auto *intensity_and_depth =
       (PointWithIntensityAndDepth::IntensityAndDepth *)img.acceleration.ptr();
 #endif
 
-  PointWithIntensityAndDepth::VectorType::iterator selected_points_it =
-      first_point;
+  auto selected_points_it = first_point;
 
   // float dt = 1.0f / 30.0f / img.height;
+
+  std::vector<PerPointData> ppdata;
+  ppdata.reserve(std::distance(first_point, last_point));
 
   for (size_t y = 0; y < img.height(); ++y) {
     // float time_interpolation = 1 + (y - 0.5f * img.height) * dt;
@@ -130,6 +118,9 @@ PointSelection::PointIterator PointSelection::selectPointsFromImage(
         // time_interpolation;
 
         ++selected_points_it;
+        ppdata.push_back(
+            PerPointData{x, y, ppdata.size(),
+                         std::fabs(intensity_and_depth->idx) + std::fabs(intensity_and_depth->idy)});
 
         if (debug_)
           debug_idx.at<uint8_t>(y, x) = 1;
@@ -140,7 +131,31 @@ PointSelection::PointIterator PointSelection::selectPointsFromImage(
     }
   }
 
-  return selected_points_it;
+  if (!grid_filter_)
+    return selected_points_it;
+
+  GridHashBase<PerPointData> gridhash(img.width(), img.height(), 5);
+  for (auto d : ppdata) {
+    gridhash.insert(d.x, d.y, d);
+  }
+
+  std::vector<PerPointData> els;
+  els.reserve(gridhash.hash_table.size());
+  for (auto& t : gridhash.hash_table) {
+    if (t.empty()) continue;
+    auto e = *std::max_element(t.begin(), t.end(), [](const PerPointData& lhs, const PerPointData& rhs) {
+      return lhs.value > rhs.value;
+    });
+    els.push_back(e);
+  }
+
+  auto grid_it = first_point;
+  for (int i = 0; i < int(els.size()); ++i) {
+    *grid_it = *(grid_it + els[i].idx);
+    grid_it++;
+  }
+
+  return grid_it;
 }
 
 PointSelection::Storage::Storage()

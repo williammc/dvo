@@ -11,7 +11,7 @@ DenseTracker::Config::Config()
           dvo::core::TDistributionInfluenceFunction::DEFAULT_DOF),
       ScaleEstimatorType(dvo::core::ScaleEstimators::TDistribution),
       ScaleEstimatorParam(dvo::core::TDistributionScaleEstimator::DEFAULT_DOF),
-      IntensityDerivativeThreshold(10.0f), DepthDerivativeThreshold(0.01f) {}
+      IntensityDerivativeThreshold(7.0f), DepthDerivativeThreshold(0.01f) {}
 
 size_t DenseTracker::Config::getNumLevels() const { return FirstLevel + 1; }
 
