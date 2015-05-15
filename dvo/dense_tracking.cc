@@ -103,7 +103,7 @@ bool DenseTracker::match(dvo::core::RgbdImagePyramid &reference,
   return match(reference_selection_, current, result);
 }
 
-bool DenseTracker::match(dvo::core::PointSelection &reference,
+bool DenseTracker::match(dvo::core::PointSelection &ref_pointselect,
                          dvo::core::RgbdImagePyramid &current,
                          dvo::DenseTracker::Result &result) {
   current.build(cfg.getNumLevels());
@@ -125,25 +125,25 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
 
   bool accept = true;
 
-  if (points_error.size() < reference.getMaximumNumberOfPoints(cfg.LastLevel))
-    points_error.resize(reference.getMaximumNumberOfPoints(cfg.LastLevel));
-  if (residuals.size() < reference.getMaximumNumberOfPoints(cfg.LastLevel))
-    residuals.resize(reference.getMaximumNumberOfPoints(cfg.LastLevel));
-  if (weights.size() < reference.getMaximumNumberOfPoints(cfg.LastLevel))
-    weights.resize(reference.getMaximumNumberOfPoints(cfg.LastLevel));
+  if (points_error.size() < ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel))
+    points_error.resize(ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel));
+  if (residuals.size() < ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel))
+    residuals.resize(ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel));
+  if (weights.size() < ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel))
+    weights.resize(ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel));
 
   std::vector<uint8_t> valid_residuals;
 
   bool debug = false;
   if (debug) {
-    reference.debug(true);
-    valid_residuals.resize(reference.getMaximumNumberOfPoints(cfg.LastLevel));
+    ref_pointselect.debug(true);
+    valid_residuals.resize(ref_pointselect.getMaximumNumberOfPoints(cfg.LastLevel));
   }
 #if 0
   std::stringstream name;
   name << std::setiosflags(std::ios::fixed) << std::setprecision(2) << current.timestamp() << "_error.avi";
 
-  cv::Size s = reference.getRgbdImagePyramid().level(size_t(cfg.LastLevel)).intensity.size();
+  cv::Size s = ref_pointselect.getRgbdImagePyramid().level(size_t(cfg.LastLevel)).intensity.size();
   cv::Mat video_frame(s.height, s.width * 2, CV_32FC1), video_frame_u8;
   cv::VideoWriter vw(name.str(), CV_FOURCC('P','I','M','1'), 30, video_frame.size(), false);
   float rgb_max = 0.0;
@@ -157,7 +157,7 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
   std::stringstream name2;
   name2 << std::setiosflags(std::ios::fixed) << std::setprecision(2) << current.timestamp() << "_cur.png";
 
-  cv::imwrite(name2.str(), reference.getRgbdImagePyramid().level(0).rgb);
+  cv::imwrite(name2.str(), ref_pointselect.getRgbdImagePyramid().level(0).rgb);
 #endif
   Eigen::Vector2f mean;
   mean.setZero();
@@ -198,12 +198,12 @@ bool DenseTracker::match(dvo::core::PointSelection &reference,
         wref_zd * float(K(1, 1)), 0.0f, 0.0f;
 
     PointSelection::PointIterator first_point, last_point;
-    reference.select(itctx_.Level, first_point, last_point);
+    ref_pointselect.select(itctx_.Level, first_point, last_point);
     cur.buildAccelerationStructure();
 
     level_stats.Id = itctx_.Level;
     level_stats.MaxValidPixels =
-        reference.getMaximumNumberOfPoints(itctx_.Level);
+        ref_pointselect.getMaximumNumberOfPoints(itctx_.Level);
     level_stats.ValidPixels = last_point - first_point;
 
     NormalEquationsLeastSquares ls;

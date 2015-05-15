@@ -48,8 +48,8 @@ public:
 
 class DVO_API PointSelection {
 public:
-  typedef PointWithIntensityAndDepth::VectorType PointVector;
-  typedef PointVector::iterator PointIterator;
+  using PointVector = PointWithIntensityAndDepth::VectorType;
+  using PointIterator = PointVector::iterator;
 
   PointSelection(const PointSelectionPredicate &predicate);
   PointSelection(dvo::core::RgbdImagePyramid &pyramid,
@@ -89,6 +89,8 @@ private:
   dvo::core::RgbdImagePyramid *pyramid_;
   std::vector<Storage> storage_;
   const PointSelectionPredicate &predicate_;
+
+  bool grid_filter_;  ///< use grid hash to filter selection
 
   bool debug_;
 
